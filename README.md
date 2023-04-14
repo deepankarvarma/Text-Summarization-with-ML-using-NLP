@@ -1,6 +1,6 @@
 # Text Summarizer
 
-## Python code for building a Text Summarizer using Machine Learning - Natural Language Processing.The data is already cleaned hence no pre-processing is required.
+## Python code for building a Text Summarizer using Machine Learning - Natural Language Processing.The data is already cleaned hence no major pre-processing is required.Used seq2seq LSTM Model.
 
 ### Dataset Link :- https://www.kaggle.com/datasets/gowrishankarp/newspaper-text-summarization-cnn-dailymail
 
