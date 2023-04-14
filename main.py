@@ -4,13 +4,14 @@ import nltk
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
-from keras.preprocessing.text import Tokenizer
-from tensorflow.keras.preprocessing.sequence import pad_sequences
+from tensorflow.keras.preprocessing.text import Tokenizer
+from tensorflow.keras.preprocessing import sequence
 from keras.models import Sequential
 from keras.layers import LSTM, Dense, Input, Embedding, RepeatVector, TimeDistributed
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
 # Step 2: Load the data into pandas dataframes
+print("Loading Data")
 train_data = pd.read_csv('cnn_dailymail/train.csv')
 valid_data = pd.read_csv('cnn_dailymail/validation.csv')
 test_data = pd.read_csv('cnn_dailymail/test.csv')
@@ -20,6 +21,7 @@ stop_words = set(stopwords.words('english'))
 stemmer = PorterStemmer()
 
 def preprocess_data(data):
+    print("Preprocessing Data")
     data['article'] = data['article'].apply(lambda x: ' '.join([stemmer.stem(word.lower()) for word in word_tokenize(x) if word.lower() not in stop_words]))
     data['highlights'] = data['highlights'].apply(lambda x: ' '.join([stemmer.stem(word.lower()) for word in word_tokenize(x) if word.lower() not in stop_words]))
     return data
@@ -29,6 +31,7 @@ valid_data = preprocess_data(valid_data)
 test_data = preprocess_data(test_data)
 
 # Step 4: Split the data into input and target variables
+print("Splitting Data")
 train_x = train_data['article'].values
 train_y = train_data['highlights'].values
 valid_x = valid_data['article'].values
@@ -37,17 +40,18 @@ test_x = test_data['article'].values
 test_y = test_data['highlights'].values
 
 # Step 5: Encode the input and target data
-tokenizer = Tokenizer()
+tokenizer = Tokenizer(num_words=5000)
 tokenizer.fit_on_texts(train_x)
 train_x = tokenizer.texts_to_sequences(train_x)
 valid_x = tokenizer.texts_to_sequences(valid_x)
 test_x = tokenizer.texts_to_sequences(test_x)
 
-tokenizer = Tokenizer()
+tokenizer = Tokenizer(num_words=5000)
 tokenizer.fit_on_texts(train_y)
 train_y = tokenizer.texts_to_sequences(train_y)
 valid_y = tokenizer.texts_to_sequences(valid_y)
 test_y = tokenizer.texts_to_sequences(test_y)
+
 
 # Step 6: Define and train the neural network model
 vocab_size = len(tokenizer.word_index) + 1
@@ -68,7 +72,7 @@ def define_model():
 model = define_model()
 model.summary()
 
-model.fit(train_x, np.array(train_y), epochs=50, validation_data=(valid_x, np.array(valid_y)))
+model.fit(train_x, np.array(train_y), epochs=2, validation_data=(valid_x, np.array(valid_y)))
 model.save('text_summarization.h5')
 # Step 7: Evaluate the model on the validation data
 preds = model.predict(valid_x)
